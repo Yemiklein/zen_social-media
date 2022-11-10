@@ -4,15 +4,32 @@ import { useNavigate } from "react-router-dom";
 import { FcGoogle } from 'react-icons/fc';
 import sharevideo from '../assets/share.mp4';
 import logo from '../assets/logowhite.png';
+import { stringify } from 'postcss';
+import {client }from '../client';
+
+// import * as dotenv from 'dotenv'
 
 
 
 
 const Login = () => {
+  const navigate = useNavigate();
   const responseGoogle = (response) => {
-    console.log(response);
-  }
+  localStorage.setItem('user', stringify(response.profileObj));
 
+  const { name, googleId, imageUrl } = response.profileObj
+
+  const doc = {
+    _id: googleId,
+    _type: 'user',
+    userName: name,
+    image: imageUrl,
+}
+
+client.createIfNotExists(doc).then(() => {
+  navigate('/', { replace: true });
+});
+};
 
   return (
     <div className='flex justify-start items-center flex'>
@@ -32,7 +49,8 @@ const Login = () => {
           </div>
           <div className='shadow-2xl'>
             <GoogleLogin
-              clientId=''
+              // clientId = {process.env.REACT_API_TOKEN}
+              clientId='72380821950-vf269jr1krrgi0jjm7lpm0nka27k9n29.apps.googleusercontent.com'
               render={renderProps => (
                 <button
                   type='button'
